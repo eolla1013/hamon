@@ -9,6 +9,9 @@ namespace Mfer2Csv
     class Program
     {
         static void Main(string[] args) {
+            
+            var reader = new MferReader();
+            reader.Read(@"D:\yoshinori\Repositories\Hamon\Data\Holter.mwf");
         }
     }
 }
