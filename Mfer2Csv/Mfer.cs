@@ -13,11 +13,24 @@ namespace Mfer2Csv
         public int SequenceCount { get; set; }
         public int SamplingInterval { get; set; }
         public int SamplingResolution { get; set; }
+        public int BlockSize { get; set; }
+        public int DataType { get; set; }
 
+        private SortedList<int, MferChannel> ChannelList;
         private SortedList<int, List<double>> SamplingList;
 
         public Mfer() {
+            this.SamplingInterval = 0;
+            this.SamplingResolution = 0;
+            this.BlockSize = 1;
+            this.DataType = 0;
+
+            this.ChannelList = new SortedList<int, MferChannel>();
             this.SamplingList = new SortedList<int, List<double>>();
+        }
+
+        public void AddChannel(int chno,MferChannel ch) {
+            this.ChannelList.Add(chno, ch);
         }
 
         public void InitSamplingList() {
@@ -37,4 +50,13 @@ namespace Mfer2Csv
             return this.SamplingList[chno];
         }
     }
+
+    class MferChannel {
+        public int? SamplingInterval { get; set; }
+        public int? SamplingResolution { get; set; }
+        public int? BlockSize { get; set; }
+        public int? DataType { get; set; }
+
+    }
+
 }

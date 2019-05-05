@@ -11,10 +11,13 @@ namespace Mfer2Csv
         static void Main(string[] args) {
             
             var reader = new MferReader();
-            var mfer=reader.Read(@"D:\yoshinori\Repositories\Hamon\Data\Holter.mwf");
-
             var writer = new MferWriter();
-            writer.Write(mfer,".","holter");
+
+            //var mfer =reader.Read(@"D:\yoshinori\Repositories\Hamon\Data\Holter.mwf");
+            //writer.Write(mfer,".","holter");
+            var mfer = reader.Read(@"D:\yoshinori\Repositories\Hamon\Data\Rac2.mwf");
+            //writer.Write(mfer, ".", "Rac2");
+
         }
     }
 }
