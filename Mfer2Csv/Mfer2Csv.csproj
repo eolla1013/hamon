@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Mfer.cs" />
     <Compile Include="MferReader.cs" />
+    <Compile Include="MferWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -8,13 +8,14 @@ namespace Mfer2Csv
 {
     class MferReader
     {
+
         public MferReader() {
 
         }
 
-        public void Read(string filename) {
+        public Mfer Read(string filename) {
+            var inmfer = new Mfer();
             using (var stm = System.IO.File.OpenRead(filename)) {
-                var inmfer = new Mfer();
                 bool headflg = true;
                 while (stm.Position < stm.Length) {
                     int cmdbyte = stm.ReadByte();
@@ -81,6 +82,7 @@ namespace Mfer2Csv
                                 } else {
                                     int sen = this.GetInt32_LE(data, 2, data.Length - 2);
                                     System.Diagnostics.Debug.Print("MWF_SEN:{0} uV", sen);
+                                    inmfer.SamplingResolution = sen;
                                 }
                                 break;
                             case 0x0B:      //MWF_IVL
@@ -89,6 +91,7 @@ namespace Mfer2Csv
                                 } else {
                                     int ivl = this.GetInt32_LE(data, 2, data.Length-2);
                                     System.Diagnostics.Debug.Print("MWF_IVL:{0} msec", ivl);
+                                    inmfer.SamplingInterval = ivl;
                                 }
                                 break;
                             case 0x04:      //MWF_BLK
@@ -116,6 +119,7 @@ namespace Mfer2Csv
                         break;
                     }
                 }
+                inmfer.InitSamplingList();
                 while (stm.Position < stm.Length) {
                     var cmdbyt1 = stm.ReadByte();
                     var cmdbyt2 = stm.ReadByte();
@@ -131,13 +135,27 @@ namespace Mfer2Csv
                     stm.Read(data, 0, lenbyte);
                     int chlen = data.Length / inmfer.ChannelCount;
                     for (int chno = 0; chno < inmfer.ChannelCount; chno++) {
-                        for(int i = 0; i < chlen; i+=2) {
-
+                        System.Diagnostics.Debug.Print("  Channel:{0}", chno);
+                        for (int i = 0; i < chlen; i+=2) {
+                            int val = this.GetInt16_LE(data, i+(chno*chlen));
+                            double volt = val * inmfer.SamplingResolution * 0.000001;
+                            //System.Diagnostics.Debug.Print("{0}", val);
+                            inmfer.AddSampleData(chno, volt);
                         }
+                        System.Diagnostics.Debug.Print("  Count:{0}", inmfer.GetSamplingCount(chno));
                     }
                 }
             }
+            return inmfer;
+        }
 
+        private int GetInt16_LE(byte[] indata,int sidx) {
+            ushort uret = 0;
+            int b2 = indata[sidx];
+            int b1 = indata[sidx+1];
+            uret = (ushort)((b1 << 8 ) + b2);
+
+            return (short)uret;
         }
 
         private int GetInt32_LE(byte[] indata) {
