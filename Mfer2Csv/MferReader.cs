@@ -132,10 +132,16 @@ namespace Mfer2Csv
                 }
                 inmfer.InitSamplingList();
                 while (stm.Position < stm.Length) {
+                    System.Diagnostics.Debug.Print("MWF_WAV:Pos={0}", stm.Position);
                     var cmdbyt1 = stm.ReadByte();
                     var cmdbyt2 = stm.ReadByte();
+
                     if (cmdbyt1 != 0x1E || cmdbyt2 != 0x84) {
-                        System.Diagnostics.Debug.Print("MWF_WAV:Not Wave data Pos:{0},{0}-{1}", stm.Position,cmdbyt1, cmdbyt2);
+                        if (cmdbyt1 == 0x80 && cmdbyt2 == 0x00) {
+                            System.Diagnostics.Debug.Print("MWF_WAV:End");
+                        } else {
+                            System.Diagnostics.Debug.Print("MWF_WAV:Not Wave data Pos:{0},{1}-{2}", stm.Position, cmdbyt1, cmdbyt2);
+                        }
                         break;
                     }
                     byte[] lendata = new byte[4];
@@ -144,6 +150,23 @@ namespace Mfer2Csv
                     System.Diagnostics.Debug.Print("  Read:{0} [byte]", lenbyte);
                     byte[] data = new byte[lenbyte];
                     stm.Read(data, 0, lenbyte);
+                    int idx = 0;
+                    for(int chno = 0; chno < inmfer.ChannelCount; chno++) {
+                        //System.Diagnostics.Debug.Print("  Channel:{0}", chno);
+                        int dtp = inmfer.GetDataType(chno);
+                        int blk = inmfer.GetBlockSize(chno);
+                        for(int i = 0; i < blk; i++) {
+                            if (dtp == 0) {
+                                int val = this.GetInt16_LE(data, idx);
+                                double volt = val * inmfer.GetSamplingResolution(chno);
+                                inmfer.AddSampleData(chno, volt);
+                            } else {
+                                //波形データ以外は無視
+                            }
+                            idx += 2;
+                        }
+                        //System.Diagnostics.Debug.Print("  Count:{0}", inmfer.GetSamplingCount(chno));
+                    }
                     //int chlen = data.Length / inmfer.ChannelCount;
                     //for (int chno = 0; chno < inmfer.ChannelCount; chno++) {
                     //    System.Diagnostics.Debug.Print("  Channel:{0}", chno);
@@ -183,6 +206,7 @@ namespace Mfer2Csv
                         break;
                     case 0x0A:      //MWF_DTP
                         System.Diagnostics.Debug.Print("  MWF_DTP:{0}", data[0]);
+                        ch.DataType = data[0];
                         break;
                     case 0x0B:      //MWF_IVL
                         if (data[0] != 1 || data[1] != 0xFD) {

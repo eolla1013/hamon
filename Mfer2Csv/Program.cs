@@ -16,7 +16,7 @@ namespace Mfer2Csv
             //var mfer =reader.Read(@"..\..\..\Data\Holter.mwf");
             //writer.Write(mfer,".","holter");
             var mfer = reader.Read(@"..\..\..\Data\Rac2.mwf");
-            //writer.Write(mfer, ".", "Rac2");
+            writer.Write(mfer, ".", "Rac2");
 
         }
     }
