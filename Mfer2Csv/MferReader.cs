@@ -155,7 +155,9 @@ namespace Mfer2Csv
                         //System.Diagnostics.Debug.Print("  Channel:{0}", chno);
                         int dtp = inmfer.GetDataType(chno);
                         int blk = inmfer.GetBlockSize(chno);
-                        for(int i = 0; i < blk; i++) {
+                        int seq = inmfer.GetSequenceCount(chno);
+                        int readcnt = blk * seq;
+                        for(int i = 0; i < readcnt; i++) {
                             if (dtp == 0) {
                                 int val = this.GetInt16_LE(data, idx);
                                 double volt = val * inmfer.GetSamplingResolution(chno);

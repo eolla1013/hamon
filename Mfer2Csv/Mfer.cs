@@ -57,6 +57,18 @@ namespace Mfer2Csv
             }
         }
 
+        public int GetSequenceCount(int chno) {
+            if (this.ChannelList.ContainsKey(chno)) {
+                if (this.ChannelList[chno].SequenceCount.HasValue) {
+                    return this.ChannelList[chno].SequenceCount.Value;
+                } else {
+                    return this.SequenceCount;
+                }
+            } else {
+                return this.SequenceCount;
+            }
+        }
+
         public int GetSamplingInterval(int chno) {
             if (this.ChannelList.ContainsKey(chno)) {
                 if (this.ChannelList[chno].SamplingInterval.HasValue) {
@@ -104,6 +116,7 @@ namespace Mfer2Csv
         public int? SamplingResolution { get; set; }
         public int? BlockSize { get; set; }
         public int? DataType { get; set; }
+        public int? SequenceCount { get; set; }
 
     }
 
